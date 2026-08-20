@@ -15,6 +15,11 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = ROOT / "data" / "healthcare-dataset-stroke-data.csv"
 OUTPUT_DIR = ROOT / "outputs"
 
+#: Figures are committed, unlike everything else in OUTPUT_DIR. They are
+#: referenced by the README, so leaving them in an ignored directory would
+#: render the front page as a row of broken images.
+FIGURE_DIR = ROOT / "docs" / "images"
+
 # --- reproducibility -------------------------------------------------------
 
 SEED = 42

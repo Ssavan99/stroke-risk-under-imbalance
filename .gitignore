@@ -133,8 +133,11 @@ dmypy.json
 .venv/
 venv/
 
-# Generated evaluation artifacts (regenerate with: python -m stroke.train)
-outputs/
+# Generated evaluation artifacts (regenerate with: python -m stroke.train).
+# metrics.json is tracked as the record of every number the README quotes;
+# figures are written to docs/images/ for the same reason.
+outputs/*
+!outputs/metrics.json
 
 # Extensionless confusion-matrix PNGs written by the legacy model_utils.py
 RandomForestClassifier*

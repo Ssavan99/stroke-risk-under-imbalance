@@ -64,7 +64,7 @@ Two caveats on that row, both of which cut against the result:
   specifically so the size of the temptation is on the record — but it is not
   reported here, and no table in this README uses it.
 
-![Precision-recall against the no-skill floor, with the reported operating point marked](outputs/figures/precision_recall.png)
+![Precision-recall against the no-skill floor, with the reported operating point marked](docs/images/precision_recall.png)
 
 ---
 
@@ -166,7 +166,7 @@ adds over asking someone's age.
 while multiplying every predicted probability roughly sixfold — mean predicted
 risk 0.31 against a true rate of 0.049, and Brier degrading from 0.041 to 0.160.
 
-![Reliability curve: the unweighted model tracks the diagonal, the class-weighted model does not](outputs/figures/calibration.png)
+![Reliability curve: the unweighted model tracks the diagonal, the class-weighted model does not](docs/images/calibration.png)
 
 This is why the browser demo ships the **unweighted** logistic regression rather
 than the best-scoring configuration. A page whose whole purpose is to show
@@ -174,7 +174,7 @@ someone a risk number cannot show one that is wrong by 6x.
 
 ### Why accuracy is absent
 
-![Sensitivity, precision and accuracy across every threshold](outputs/figures/threshold_tradeoff.png)
+![Sensitivity, precision and accuracy across every threshold](docs/images/threshold_tradeoff.png)
 
 Accuracy climbs to ~0.95 and stays there precisely where sensitivity collapses
 toward zero. It is highest when the model is most useless.

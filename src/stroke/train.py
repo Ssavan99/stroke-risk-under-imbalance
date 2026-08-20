@@ -44,6 +44,7 @@ from .baselines import age_only_pipeline, majority_pipeline
 from .config import (
     CV_REPEATS,
     CV_SPLITS,
+    FIGURE_DIR,
     N_BOOTSTRAP,
     N_JOBS,
     OUTPUT_DIR,
@@ -356,8 +357,8 @@ def main(argv: list[str] | None = None) -> int:
     out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"\nwrote {out.relative_to(OUTPUT_DIR.parent)}")
 
-    for path in render_all(payload, OUTPUT_DIR / "figures"):
-        print(f"wrote {path.relative_to(OUTPUT_DIR.parent)}")
+    for path in render_all(payload, FIGURE_DIR):
+        print(f"wrote {path.relative_to(FIGURE_DIR.parents[1])}")
 
     return 0
 
