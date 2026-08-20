@@ -127,3 +127,21 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# --- added during revival ---
+# Local virtualenv
+.venv/
+venv/
+
+# Generated evaluation artifacts (regenerate with: python -m stroke.train)
+outputs/
+
+# Extensionless confusion-matrix PNGs written by the legacy model_utils.py
+RandomForestClassifier*
+DecisionTreeClassifier*
+LogisticRegression*
+KNeighborsClassifier*
+MLPClassifier*
+GaussianNB*
+SVC*
+GridSearchCV*
