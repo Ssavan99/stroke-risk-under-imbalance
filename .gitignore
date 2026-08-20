@@ -145,3 +145,6 @@ MLPClassifier*
 GaussianNB*
 SVC*
 GridSearchCV*
+
+# Local editor/agent scratch
+.claude/

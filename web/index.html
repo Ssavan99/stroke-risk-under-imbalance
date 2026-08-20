@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stroke risk under class imbalance — model demonstration</title>
+<meta name="description" content="A demonstration of how a stroke risk model behaves at a real operating point. Not a diagnostic tool.">
+<style>
+:root {
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --ink: #16191d;
+  --ink-soft: #5b6169;
+  --ink-faint: #8b9099;
+  --line: #e2e4e7;
+  --line-strong: #cdd1d6;
+  --accent: #1d4ed8;
+  --warn-bg: #2c2a26;
+  --warn-ink: #f6f1e7;
+  --warn-rule: #b4801f;
+  --bar-track: #e8eaed;
+  --bar-you: #c2410c;
+  --bar-base: #98a0aa;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171a;
+    --surface: #1b1f23;
+    --ink: #e8eaed;
+    --ink-soft: #a8b0b8;
+    --ink-faint: #7d858e;
+    --line: #2b3137;
+    --line-strong: #3a424a;
+    --accent: #7ea2ff;
+    --warn-bg: #2c2a26;
+    --warn-ink: #f6f1e7;
+    --warn-rule: #d9a441;
+    --bar-track: #2b3137;
+    --bar-you: #e2703a;
+    --bar-base: #6b737c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171a; --surface: #1b1f23; --ink: #e8eaed; --ink-soft: #a8b0b8;
+  --ink-faint: #7d858e; --line: #2b3137; --line-strong: #3a424a; --accent: #7ea2ff;
+  --bar-track: #2b3137; --bar-you: #e2703a; --bar-base: #6b737c;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* --- The framing band. Sticky, first thing on the page, never dismissible. --- */
+.band {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  border-bottom: 3px solid var(--warn-rule);
+}
+.band-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.band strong {
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.band span { font-size: 13px; color: #d8d2c6; }
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 64px; }
+
+header h1 { font-size: 26px; line-height: 1.2; margin: 18px 0 8px; letter-spacing: -0.015em; }
+header .sub { color: var(--ink-soft); max-width: 62ch; margin: 0 0 6px; }
+header .meta { color: var(--ink-faint); font-size: 13px; margin: 10px 0 0; }
+header .meta a { color: var(--accent); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 22px; margin-top: 26px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card h2 {
+  font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 16px; font-weight: 600;
+}
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 5px; }
+.field input[type="number"], .field select {
+  width: 100%; padding: 8px 10px; font: inherit; font-size: 14px;
+  color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line-strong); border-radius: 7px;
+}
+.field input:focus-visible, .field select:focus-visible, .slider:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 1px;
+}
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.checks { display: flex; gap: 18px; flex-wrap: wrap; margin: 4px 0 14px; }
+.checks label { display: flex; gap: 7px; align-items: center; font-size: 14px; color: var(--ink); }
+.hint { font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+
+/* --- Result. The number is never allowed to stand on its own. --- */
+.headline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.freq { font-size: 30px; font-weight: 620; letter-spacing: -0.02em; }
+.freq em { font-style: normal; color: var(--ink-faint); font-weight: 400; font-size: 20px; }
+.pct { color: var(--ink-soft); font-size: 15px; }
+
+.bars { margin: 18px 0 6px; }
+.bar-row { display: grid; grid-template-columns: 132px 1fr 62px; gap: 10px; align-items: center; margin-bottom: 9px; font-size: 13px; }
+.bar-row .lbl { color: var(--ink-soft); }
+.bar-track { height: 12px; background: var(--bar-track); border-radius: 6px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width .18s ease; }
+.bar-row .val { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+.verdict {
+  margin: 18px 0 0; padding: 14px 16px; border-radius: 8px;
+  border: 1px solid var(--line-strong); background: var(--bg);
+}
+.verdict .tag { font-size: 12px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint); }
+.verdict p { margin: 6px 0 0; font-size: 14px; }
+
+.slider-block { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.slider-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.slider-head .k { font-size: 13px; color: var(--ink-soft); }
+.slider-head .v { font-variant-numeric: tabular-nums; font-size: 13px; }
+.slider { width: 100%; margin: 12px 0 4px; accent-color: var(--accent); }
+
+.tradeoff { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
+.stat .k { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); }
+.stat .v { font-size: 19px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.stat .n { font-size: 12px; color: var(--ink-faint); }
+@media (max-width: 520px) { .tradeoff { grid-template-columns: 1fr; } }
+
+.notes { margin-top: 22px; }
+.notes h2 { font-size: 12px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 12px; }
+.notes ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 14px; }
+.notes li { margin-bottom: 8px; }
+.notes strong { color: var(--ink); font-weight: 600; }
+
+footer { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink-faint); font-size: 13px; }
+footer a { color: var(--accent); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+.parity { margin-top: 10px; font-size: 12px; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+
+<div class="band" role="note">
+  <div class="band-inner">
+    <strong>Demonstration only — not a medical tool</strong>
+    <span>Trained on one small public dataset of 5,110 records. It cannot assess anyone's health, and its output is not a diagnosis, a screening result, or medical advice.</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>What a stroke risk model actually does at its operating point</h1>
+    <p class="sub">
+      Most public versions of this project report ~95% accuracy on a dataset where
+      4.87% of people had a stroke — a number you can beat by predicting "no" every
+      time. This page exists to show the other side of that: what the model gets
+      right, what it costs, and how often it is wrong when it says yes.
+    </p>
+    <p class="meta">
+      Unweighted logistic regression · held-out PR-AUC <span id="m-prauc">—</span>
+      against a no-skill floor of <span id="m-base">—</span> ·
+      <a href="https://github.com/Ssavan99/stroke-risk-under-imbalance">source and full results</a>
+    </p>
+  </header>
+
+  <div class="grid">
+    <!-- ---------------- inputs ---------------- -->
+    <section class="card" aria-labelledby="h-inputs">
+      <h2 id="h-inputs">Hypothetical inputs</h2>
+
+      <div class="row2">
+        <div class="field">
+          <label for="age">Age</label>
+          <input type="number" id="age" min="0" max="100" step="1" value="58">
+        </div>
+        <div class="field">
+          <label for="gender">Sex recorded in the dataset</label>
+          <select id="gender"><option>Female</option><option>Male</option><option>Other</option></select>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="glucose">Average glucose (mg/dL)</label>
+          <input type="number" id="glucose" min="40" max="300" step="0.1" value="105">
+        </div>
+        <div class="field">
+          <label for="bmi">BMI</label>
+          <input type="number" id="bmi" min="10" max="70" step="0.1" value="28">
+          <div class="hint">Leave blank to see how the model treats a missing value.</div>
+        </div>
+      </div>
+
+      <div class="checks">
+        <label><input type="checkbox" id="hypertension"> Hypertension</label>
+        <label><input type="checkbox" id="heart"> Heart disease</label>
+        <label><input type="checkbox" id="married" checked> Ever married</label>
+      </div>
+
+      <div class="field">
+        <label for="work">Work type</label>
+        <select id="work">
+          <option>Private</option><option>Self-employed</option>
+          <option>Govt_job</option><option>children</option><option>Never_worked</option>
+        </select>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="residence">Residence</label>
+          <select id="residence"><option>Urban</option><option>Rural</option></select>
+        </div>
+        <div class="field">
+          <label for="smoking">Smoking status</label>
+          <select id="smoking">
+            <option>never smoked</option><option>formerly smoked</option>
+            <option>smokes</option><option>Unknown</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint">
+        These are the only ten variables the dataset contains. It has no family
+        history, no blood pressure reading, no cholesterol, no medication, and no
+        record of when or where any of it was collected.
+      </p>
+    </section>
+
+    <!-- ---------------- result ---------------- -->
+    <section class="card" aria-labelledby="h-result" aria-live="polite">
+      <h2 id="h-result">What the model outputs for those inputs</h2>
+
+      <div class="headline">
+        <div class="freq"><span id="freq-n">—</span> <em>in 100</em></div>
+        <div class="pct">people like this in the dataset had a stroke (<span id="pct">—</span>)</div>
+      </div>
+
+      <div class="bars">
+        <div class="bar-row">
+          <div class="lbl">These inputs</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-you" style="width:0%;background:var(--bar-you)"></div></div>
+          <div class="val" id="val-you">—</div>
+        </div>
+        <div class="bar-row">
+          <div class="lbl">Dataset average</div>
+          <div class="bar-track"><div class="bar-fill" id="bar-base" style="width:0%;background:var(--bar-base)"></div></div>
+          <div class="val" id="val-base">—</div>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <div class="tag">At the current threshold</div>
+        <p id="verdict-text">—</p>
+      </div>
+
+      <div class="slider-block">
+        <div class="slider-head">
+          <span class="k">Decision threshold — where you draw the line</span>
+          <span class="v" id="thr-val">—</span>
+        </div>
+        <input type="range" class="slider" id="thr" min="0.005" max="0.35" step="0.001" value="0.047"
+               aria-label="Decision threshold">
+        <div class="slider-head">
+          <span class="k" style="font-size:12px">catch more cases, flag more people</span>
+          <span class="k" style="font-size:12px">flag fewer people, miss more cases</span>
+        </div>
+
+        <div class="tradeoff">
+          <div class="stat">
+            <div class="k">Cases caught</div>
+            <div class="v" id="s-sens">—</div>
+            <div class="n" id="s-sens-n">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Of those flagged, actually had a stroke</div>
+            <div class="v" id="s-prec">—</div>
+            <div class="n" id="s-prec-n">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">People flagged</div>
+            <div class="v" id="s-flag">—</div>
+            <div class="n" id="s-flag-n">—</div>
+          </div>
+        </div>
+        <p class="hint" id="reset-note"></p>
+      </div>
+    </section>
+  </div>
+
+  <section class="card notes">
+    <h2>What this number is not</h2>
+    <ul>
+      <li><strong>It is not your risk.</strong> It is the rate observed among people with similar values in one dataset of 5,110 records whose origin, country and time period are not published. Nothing about it is calibrated to you.</li>
+      <li><strong>Most of the people it flags did not have a stroke.</strong> At the default threshold, roughly <span id="inline-fp">—</span> of every 10 flagged people are false alarms. That is not a defect in this particular model — it is what any model faces when the outcome affects about 1 person in 20.</li>
+      <li><strong>The model barely beats age on its own.</strong> A logistic regression using nothing but age reaches a ROC-AUC of 0.834; adding the other nine variables moves it to 0.843. Most of what this page reacts to is how old you said you were.</li>
+      <li><strong>The confidence intervals are wide.</strong> Only about 50 stroke cases land in the held-out set, so the reported PR-AUC of <span id="inline-prauc">—</span> carries a 95% interval of roughly 0.15–0.33.</li>
+      <li><strong>Missing BMI is treated as information, not absence.</strong> In this dataset the 201 records with no BMI have a 19.9% stroke rate against 4.26% elsewhere — probably an artifact of how the data was collected rather than anything biological. Leave BMI blank and you will see the estimate move for that reason.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>
+      Static page. The model is 22 logistic regression coefficients evaluated in your
+      browser — nothing is uploaded, and there is no server.
+      <span id="parity" class="parity"></span>
+    </p>
+    <p>
+      If you have an actual concern about stroke risk, that is a conversation for a
+      clinician, who has access to the things this dataset does not contain.
+    </p>
+  </footer>
+</div>
+
+<script src="model.js"></script>
+<script src="parity-fixture.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var M = window.STROKE_MODEL;
+  if (!M) { document.getElementById("verdict-text").textContent =
+    "model.js failed to load — run: python -m stroke.export_web"; return; }
+
+  var P = M.preprocess;
+  var OP = M.operating_point;
+  var perf = M.performance;
+
+  /* ---- the model, reimplemented as the dot product it is ---- */
+  function featureVector(input) {
+    var v = [];
+    var i, j;
+    for (i = 0; i < P.numeric_features.length; i++) {
+      var f = P.numeric_features[i];
+      var x = input[f];
+      if (x === null || x === undefined || x === "" || isNaN(x)) x = P.numeric_fill[f];
+      v.push((Number(x) - P.scaler_mean[i]) / P.scaler_scale[i]);
+    }
+    var offset = P.numeric_features.length;
+    for (j = 0; j < P.indicator_features.length; j++) {
+      var g = P.indicator_features[j];
+      var raw = input[g];
+      var isMissing = (raw === null || raw === undefined || raw === "" || isNaN(raw)) ? 1 : 0;
+      var idx = offset + j;
+      v.push((isMissing - P.scaler_mean[idx]) / P.scaler_scale[idx]);
+    }
+    for (i = 0; i < P.categorical_features.length; i++) {
+      var cf = P.categorical_features[i];
+      var val = input[cf];
+      if (val === null || val === undefined || val === "") val = P.categorical_fill[cf];
+      var cats = P.categories[cf];
+      for (j = 0; j < cats.length; j++) v.push(val === cats[j] ? 1 : 0);
+    }
+    return v;
+  }
+
+  function predict(input) {
+    var v = featureVector(input);
+    var z = M.intercept;
+    for (var i = 0; i < v.length; i++) z += M.coefficients[i] * v[i];
+    return 1 / (1 + Math.exp(-z));
+  }
+
+  /* ---- self-check against the vectors scikit-learn produced ---- */
+  (function parity() {
+    var F = window.STROKE_PARITY, el = document.getElementById("parity");
+    if (!F || !el) return;
+    var worst = 0;
+    F.cases.forEach(function (c) {
+      worst = Math.max(worst, Math.abs(predict(c.input) - c.expected));
+    });
+    el.textContent = worst < 1e-9
+      ? "Verified against scikit-learn on " + F.cases.length + " held-out records (max difference " + worst.toExponential(1) + ")."
+      : "PARITY FAILURE: max difference " + worst.toExponential(2) + " — the exported model does not match scikit-learn.";
+    if (worst >= 1e-9) el.style.color = "var(--bar-you)";
+  })();
+
+  /* ---- the threshold sweep, so the page can answer "what if" ---- */
+  var SWEEP = M.sweep || null;
+
+  function nearestSweep(t) {
+    if (!SWEEP) return null;
+    var best = SWEEP[0];
+    for (var i = 1; i < SWEEP.length; i++) {
+      if (Math.abs(SWEEP[i].threshold - t) < Math.abs(best.threshold - t)) best = SWEEP[i];
+    }
+    return best;
+  }
+
+  var els = {
+    age: document.getElementById("age"),
+    gender: document.getElementById("gender"),
+    glucose: document.getElementById("glucose"),
+    bmi: document.getElementById("bmi"),
+    hypertension: document.getElementById("hypertension"),
+    heart: document.getElementById("heart"),
+    married: document.getElementById("married"),
+    work: document.getElementById("work"),
+    residence: document.getElementById("residence"),
+    smoking: document.getElementById("smoking"),
+    thr: document.getElementById("thr")
+  };
+
+  function readInputs() {
+    var bmi = els.bmi.value.trim();
+    return {
+      age: Number(els.age.value),
+      avg_glucose_level: Number(els.glucose.value),
+      bmi: bmi === "" ? null : Number(bmi),
+      hypertension: els.hypertension.checked ? 1 : 0,
+      heart_disease: els.heart.checked ? 1 : 0,
+      gender: els.gender.value,
+      ever_married: els.married.checked ? "Yes" : "No",
+      work_type: els.work.value,
+      Residence_type: els.residence.value,
+      smoking_status: els.smoking.value
+    };
+  }
+
+  function pct(x, dp) { return (100 * x).toFixed(dp === undefined ? 1 : dp) + "%"; }
+
+  function render() {
+    var risk = predict(readInputs());
+    var thr = Number(els.thr.value);
+    var base = perf.prevalence;
+
+    /* The risk is rendered as a natural frequency first, because "7 in 100" is
+       read correctly far more often than "6.8%", and never without the dataset
+       average sitting directly beneath it for comparison. */
+    var per100 = risk * 100;
+    document.getElementById("freq-n").textContent =
+      per100 < 1 ? "under 1" : Math.round(per100).toString();
+    document.getElementById("pct").textContent = pct(risk);
+
+    var scale = Math.max(0.25, risk * 1.35, base * 3);
+    document.getElementById("bar-you").style.width = Math.min(100, 100 * risk / scale) + "%";
+    document.getElementById("bar-base").style.width = Math.min(100, 100 * base / scale) + "%";
+    document.getElementById("val-you").textContent = pct(risk);
+    document.getElementById("val-base").textContent = pct(base);
+
+    document.getElementById("thr-val").textContent = thr.toFixed(3);
+
+    var flagged = risk >= thr;
+    var s = nearestSweep(thr);
+    var precision = s ? s.precision : OP.precision;
+    var sens = s ? s.sensitivity : OP.sensitivity;
+    var flagFrac = s ? s.flagged_fraction : (OP.tp + OP.fp) / perf.n_test;
+
+    document.getElementById("verdict-text").innerHTML = flagged
+      ? "These inputs would be <strong>flagged</strong>. Among everyone this threshold flags in the held-out data, about <strong>" +
+        pct(precision, 0) + "</strong> actually had a stroke — so being flagged here is closer to “worth a second look” than to a finding."
+      : "These inputs would <strong>not</strong> be flagged. This threshold also misses about <strong>" +
+        pct(1 - sens, 0) + "</strong> of the people who did have a stroke, so not being flagged is not reassurance.";
+
+    document.getElementById("s-sens").textContent = pct(sens, 0);
+    document.getElementById("s-sens-n").textContent =
+      s ? Math.round(sens * perf.n_test_positive) + " of " + perf.n_test_positive + " cases" : "";
+    document.getElementById("s-prec").textContent = pct(precision, 0);
+    document.getElementById("s-prec-n").textContent =
+      precision > 0 ? "about 1 in " + (1 / precision).toFixed(1) + " flagged" : "none flagged";
+    document.getElementById("s-flag").textContent = pct(flagFrac, 0);
+    document.getElementById("s-flag-n").textContent =
+      s ? Math.round(flagFrac * perf.n_test) + " of " + perf.n_test + " people" : "";
+
+    document.getElementById("reset-note").textContent =
+      Math.abs(thr - OP.threshold) < 0.0005
+        ? "This is the reported operating point, chosen on training data to catch 80% of cases."
+        : "Reported operating point is " + OP.threshold.toFixed(3) + ". Move the slider back to compare.";
+  }
+
+  /* static figures quoted in the prose */
+  document.getElementById("m-prauc").textContent = perf.pr_auc.toFixed(3);
+  document.getElementById("m-base").textContent = perf.pr_auc_no_skill.toFixed(3);
+  document.getElementById("inline-prauc").textContent = perf.pr_auc.toFixed(3);
+  document.getElementById("inline-fp").textContent = Math.round(10 * (1 - OP.precision)).toString();
+
+  els.thr.value = OP.threshold.toFixed(3);
+  Object.keys(els).forEach(function (k) {
+    els[k].addEventListener("input", render);
+    els[k].addEventListener("change", render);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
