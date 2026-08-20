@@ -41,6 +41,12 @@ jobs:
       - name: Test
         run: pytest
 
+      # Runs here, on a PR, and not only in the Pages deploy on main. The guard
+      # is the thing most likely to disagree between a laptop and a runner, so
+      # it has to be exercised where it can still be fixed cheaply.
+      - name: Verify the exported model is current
+        run: python -m stroke.export_web --check
+
       # The smoke run uses --fast (one CV repeat, 200 bootstrap resamples) so CI
       # stays inside the free tier. The figures published in the README come from
       # a full local run, not from this job.
