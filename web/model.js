@@ -1,0 +1,700 @@
+window.STROKE_MODEL = {
+  "schema": 1,
+  "model": "logistic_regression (unweighted)",
+  "preprocess": {
+    "numeric_features": [
+      "age",
+      "avg_glucose_level",
+      "bmi",
+      "hypertension",
+      "heart_disease"
+    ],
+    "numeric_fill": {
+      "age": 45.0,
+      "avg_glucose_level": 91.945,
+      "bmi": 28.0,
+      "hypertension": 0.0,
+      "heart_disease": 0.0
+    },
+    "indicator_features": [
+      "bmi"
+    ],
+    "scaler_mean": [
+      43.35328767123288,
+      106.31716731898237,
+      28.883830724070453,
+      0.09711350293542075,
+      0.05406066536203522,
+      0.041585127201565555
+    ],
+    "scaler_scale": [
+      22.59405159481372,
+      45.254116442480864,
+      7.762968778066298,
+      0.29611225993368256,
+      0.22613736936351156,
+      0.19963918552527501
+    ],
+    "categorical_features": [
+      "gender",
+      "ever_married",
+      "work_type",
+      "Residence_type",
+      "smoking_status"
+    ],
+    "categorical_fill": {
+      "gender": "Female",
+      "ever_married": "Yes",
+      "work_type": "Private",
+      "Residence_type": "Urban",
+      "smoking_status": "never smoked"
+    },
+    "categories": {
+      "gender": [
+        "Female",
+        "Male",
+        "Other"
+      ],
+      "ever_married": [
+        "No",
+        "Yes"
+      ],
+      "work_type": [
+        "Govt_job",
+        "Never_worked",
+        "Private",
+        "Self-employed",
+        "children"
+      ],
+      "Residence_type": [
+        "Rural",
+        "Urban"
+      ],
+      "smoking_status": [
+        "Unknown",
+        "formerly smoked",
+        "never smoked",
+        "smokes"
+      ]
+    }
+  },
+  "coefficients": [
+    1.6299094250670254,
+    0.15124761574368262,
+    0.06588698090851648,
+    0.11728765380094935,
+    0.03432982269980076,
+    0.28494887656895246,
+    -0.0015152531025527504,
+    0.032730155895174855,
+    -0.018927850239099736,
+    0.13829124698416698,
+    -0.12600419443064675,
+    0.0014616697138329724,
+    -0.06653348809772638,
+    0.06830539122316573,
+    -0.21311121314422207,
+    0.22216469285847912,
+    -0.024496789439764518,
+    0.036783841993295166,
+    -0.14558018863196945,
+    0.10403557150306321,
+    -0.08057982454453727,
+    0.13441149422696383
+  ],
+  "intercept": -4.0424960794090365,
+  "feature_names": [
+    "num__age",
+    "num__avg_glucose_level",
+    "num__bmi",
+    "num__hypertension",
+    "num__heart_disease",
+    "num__missingindicator_bmi",
+    "cat__gender_Female",
+    "cat__gender_Male",
+    "cat__gender_Other",
+    "cat__ever_married_No",
+    "cat__ever_married_Yes",
+    "cat__work_type_Govt_job",
+    "cat__work_type_Never_worked",
+    "cat__work_type_Private",
+    "cat__work_type_Self-employed",
+    "cat__work_type_children",
+    "cat__Residence_type_Rural",
+    "cat__Residence_type_Urban",
+    "cat__smoking_status_Unknown",
+    "cat__smoking_status_formerly smoked",
+    "cat__smoking_status_never smoked",
+    "cat__smoking_status_smokes"
+  ],
+  "operating_point": {
+    "threshold": 0.047380782231217645,
+    "sensitivity": 0.8,
+    "specificity": 0.7448559670781894,
+    "precision": 0.1388888888888889,
+    "npv": 0.9863760217983651,
+    "false_positive_rate": 0.2551440329218107,
+    "number_needed_to_screen": 7.199999999999999,
+    "tp": 40,
+    "fp": 248,
+    "fn": 10,
+    "tn": 724
+  },
+  "sweep": [
+    {
+      "threshold": 0.0006762831582565517,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.04892367906066536,
+      "accuracy": 0.04892367906066536,
+      "flagged": 1022,
+      "flagged_fraction": 1.0
+    },
+    {
+      "threshold": 0.009850128404334971,
+      "sensitivity": 0.92,
+      "specificity": 0.4269547325102881,
+      "precision": 0.07628524046434494,
+      "accuracy": 0.45107632093933464,
+      "flagged": 603,
+      "flagged_fraction": 0.5900195694716243
+    },
+    {
+      "threshold": 0.01902397365041339,
+      "sensitivity": 0.88,
+      "specificity": 0.565843621399177,
+      "precision": 0.0944206008583691,
+      "accuracy": 0.5812133072407045,
+      "flagged": 466,
+      "flagged_fraction": 0.45596868884540115
+    },
+    {
+      "threshold": 0.02819781889649181,
+      "sensitivity": 0.86,
+      "specificity": 0.6347736625514403,
+      "precision": 0.10804020100502512,
+      "accuracy": 0.6457925636007827,
+      "flagged": 398,
+      "flagged_fraction": 0.38943248532289626
+    },
+    {
+      "threshold": 0.03737166414257023,
+      "sensitivity": 0.86,
+      "specificity": 0.6975308641975309,
+      "precision": 0.12759643916913946,
+      "accuracy": 0.7054794520547946,
+      "flagged": 337,
+      "flagged_fraction": 0.32974559686888455
+    },
+    {
+      "threshold": 0.046545509388648654,
+      "sensitivity": 0.8,
+      "specificity": 0.742798353909465,
+      "precision": 0.13793103448275862,
+      "accuracy": 0.7455968688845401,
+      "flagged": 290,
+      "flagged_fraction": 0.2837573385518591
+    },
+    {
+      "threshold": 0.05571935463472707,
+      "sensitivity": 0.8,
+      "specificity": 0.7757201646090535,
+      "precision": 0.15503875968992248,
+      "accuracy": 0.776908023483366,
+      "flagged": 258,
+      "flagged_fraction": 0.25244618395303325
+    },
+    {
+      "threshold": 0.06489319988080548,
+      "sensitivity": 0.78,
+      "specificity": 0.8034979423868313,
+      "precision": 0.16956521739130434,
+      "accuracy": 0.8023483365949119,
+      "flagged": 230,
+      "flagged_fraction": 0.22504892367906065
+    },
+    {
+      "threshold": 0.0740670451268839,
+      "sensitivity": 0.74,
+      "specificity": 0.8240740740740741,
+      "precision": 0.1778846153846154,
+      "accuracy": 0.8199608610567515,
+      "flagged": 208,
+      "flagged_fraction": 0.2035225048923679
+    },
+    {
+      "threshold": 0.08324089037296233,
+      "sensitivity": 0.72,
+      "specificity": 0.8425925925925926,
+      "precision": 0.19047619047619047,
+      "accuracy": 0.8365949119373777,
+      "flagged": 189,
+      "flagged_fraction": 0.18493150684931506
+    },
+    {
+      "threshold": 0.09241473561904075,
+      "sensitivity": 0.7,
+      "specificity": 0.8518518518518519,
+      "precision": 0.19553072625698323,
+      "accuracy": 0.8444227005870841,
+      "flagged": 179,
+      "flagged_fraction": 0.175146771037182
+    },
+    {
+      "threshold": 0.10158858086511917,
+      "sensitivity": 0.7,
+      "specificity": 0.8703703703703703,
+      "precision": 0.21739130434782608,
+      "accuracy": 0.8620352250489237,
+      "flagged": 161,
+      "flagged_fraction": 0.15753424657534246
+    },
+    {
+      "threshold": 0.11076242611119758,
+      "sensitivity": 0.66,
+      "specificity": 0.8806584362139918,
+      "precision": 0.2214765100671141,
+      "accuracy": 0.8698630136986302,
+      "flagged": 149,
+      "flagged_fraction": 0.14579256360078277
+    },
+    {
+      "threshold": 0.119936271357276,
+      "sensitivity": 0.6,
+      "specificity": 0.8909465020576132,
+      "precision": 0.22058823529411764,
+      "accuracy": 0.8767123287671232,
+      "flagged": 136,
+      "flagged_fraction": 0.13307240704500978
+    },
+    {
+      "threshold": 0.12911011660335442,
+      "sensitivity": 0.58,
+      "specificity": 0.9002057613168725,
+      "precision": 0.23015873015873015,
+      "accuracy": 0.8845401174168297,
+      "flagged": 126,
+      "flagged_fraction": 0.1232876712328767
+    },
+    {
+      "threshold": 0.13828396184943284,
+      "sensitivity": 0.58,
+      "specificity": 0.9104938271604939,
+      "precision": 0.25,
+      "accuracy": 0.8943248532289628,
+      "flagged": 116,
+      "flagged_fraction": 0.11350293542074363
+    },
+    {
+      "threshold": 0.14745780709551126,
+      "sensitivity": 0.44,
+      "specificity": 0.9259259259259259,
+      "precision": 0.23404255319148937,
+      "accuracy": 0.9021526418786693,
+      "flagged": 94,
+      "flagged_fraction": 0.09197651663405088
+    },
+    {
+      "threshold": 0.15663165234158968,
+      "sensitivity": 0.42,
+      "specificity": 0.9320987654320988,
+      "precision": 0.2413793103448276,
+      "accuracy": 0.9070450097847358,
+      "flagged": 87,
+      "flagged_fraction": 0.08512720156555773
+    },
+    {
+      "threshold": 0.1658054975876681,
+      "sensitivity": 0.38,
+      "specificity": 0.9382716049382716,
+      "precision": 0.24050632911392406,
+      "accuracy": 0.910958904109589,
+      "flagged": 79,
+      "flagged_fraction": 0.07729941291585127
+    },
+    {
+      "threshold": 0.17497934283374653,
+      "sensitivity": 0.34,
+      "specificity": 0.9454732510288066,
+      "precision": 0.24285714285714285,
+      "accuracy": 0.9158512720156555,
+      "flagged": 70,
+      "flagged_fraction": 0.0684931506849315
+    },
+    {
+      "threshold": 0.18415318807982495,
+      "sensitivity": 0.3,
+      "specificity": 0.9537037037037037,
+      "precision": 0.25,
+      "accuracy": 0.9217221135029354,
+      "flagged": 60,
+      "flagged_fraction": 0.05870841487279843
+    },
+    {
+      "threshold": 0.19332703332590337,
+      "sensitivity": 0.24,
+      "specificity": 0.9567901234567902,
+      "precision": 0.2222222222222222,
+      "accuracy": 0.9217221135029354,
+      "flagged": 54,
+      "flagged_fraction": 0.05283757338551859
+    },
+    {
+      "threshold": 0.2025008785719818,
+      "sensitivity": 0.24,
+      "specificity": 0.9619341563786008,
+      "precision": 0.24489795918367346,
+      "accuracy": 0.9266144814090019,
+      "flagged": 49,
+      "flagged_fraction": 0.04794520547945205
+    },
+    {
+      "threshold": 0.2116747238180602,
+      "sensitivity": 0.2,
+      "specificity": 0.9650205761316872,
+      "precision": 0.22727272727272727,
+      "accuracy": 0.9275929549902152,
+      "flagged": 44,
+      "flagged_fraction": 0.043052837573385516
+    },
+    {
+      "threshold": 0.2208485690641386,
+      "sensitivity": 0.18,
+      "specificity": 0.9722222222222222,
+      "precision": 0.25,
+      "accuracy": 0.9334637964774951,
+      "flagged": 36,
+      "flagged_fraction": 0.03522504892367906
+    },
+    {
+      "threshold": 0.23002241431021703,
+      "sensitivity": 0.16,
+      "specificity": 0.9742798353909465,
+      "precision": 0.24242424242424243,
+      "accuracy": 0.9344422700587084,
+      "flagged": 33,
+      "flagged_fraction": 0.03228962818003914
+    },
+    {
+      "threshold": 0.23919625955629545,
+      "sensitivity": 0.16,
+      "specificity": 0.977366255144033,
+      "precision": 0.26666666666666666,
+      "accuracy": 0.9373776908023483,
+      "flagged": 30,
+      "flagged_fraction": 0.029354207436399216
+    },
+    {
+      "threshold": 0.24837010480237387,
+      "sensitivity": 0.16,
+      "specificity": 0.9814814814814815,
+      "precision": 0.3076923076923077,
+      "accuracy": 0.9412915851272016,
+      "flagged": 26,
+      "flagged_fraction": 0.025440313111545987
+    },
+    {
+      "threshold": 0.2575439500484523,
+      "sensitivity": 0.14,
+      "specificity": 0.9835390946502057,
+      "precision": 0.30434782608695654,
+      "accuracy": 0.9422700587084148,
+      "flagged": 23,
+      "flagged_fraction": 0.022504892367906065
+    },
+    {
+      "threshold": 0.26671779529453077,
+      "sensitivity": 0.12,
+      "specificity": 0.9845679012345679,
+      "precision": 0.2857142857142857,
+      "accuracy": 0.9422700587084148,
+      "flagged": 21,
+      "flagged_fraction": 0.02054794520547945
+    },
+    {
+      "threshold": 0.27589164054060916,
+      "sensitivity": 0.12,
+      "specificity": 0.9866255144032922,
+      "precision": 0.3157894736842105,
+      "accuracy": 0.9442270058708415,
+      "flagged": 19,
+      "flagged_fraction": 0.018590998043052837
+    },
+    {
+      "threshold": 0.2850654857866876,
+      "sensitivity": 0.12,
+      "specificity": 0.9897119341563786,
+      "precision": 0.375,
+      "accuracy": 0.9471624266144814,
+      "flagged": 16,
+      "flagged_fraction": 0.015655577299412915
+    },
+    {
+      "threshold": 0.294239331032766,
+      "sensitivity": 0.1,
+      "specificity": 0.9907407407407407,
+      "precision": 0.35714285714285715,
+      "accuracy": 0.9471624266144814,
+      "flagged": 14,
+      "flagged_fraction": 0.0136986301369863
+    },
+    {
+      "threshold": 0.3034131762788444,
+      "sensitivity": 0.1,
+      "specificity": 0.992798353909465,
+      "precision": 0.4166666666666667,
+      "accuracy": 0.949119373776908,
+      "flagged": 12,
+      "flagged_fraction": 0.011741682974559686
+    },
+    {
+      "threshold": 0.31258702152492285,
+      "sensitivity": 0.1,
+      "specificity": 0.992798353909465,
+      "precision": 0.4166666666666667,
+      "accuracy": 0.949119373776908,
+      "flagged": 12,
+      "flagged_fraction": 0.011741682974559686
+    },
+    {
+      "threshold": 0.32176086677100124,
+      "sensitivity": 0.08,
+      "specificity": 0.9938271604938271,
+      "precision": 0.4,
+      "accuracy": 0.949119373776908,
+      "flagged": 10,
+      "flagged_fraction": 0.009784735812133072
+    },
+    {
+      "threshold": 0.3309347120170797,
+      "sensitivity": 0.08,
+      "specificity": 0.9938271604938271,
+      "precision": 0.4,
+      "accuracy": 0.949119373776908,
+      "flagged": 10,
+      "flagged_fraction": 0.009784735812133072
+    },
+    {
+      "threshold": 0.3401085572631581,
+      "sensitivity": 0.06,
+      "specificity": 0.9938271604938271,
+      "precision": 0.3333333333333333,
+      "accuracy": 0.9481409001956947,
+      "flagged": 9,
+      "flagged_fraction": 0.008806262230919765
+    },
+    {
+      "threshold": 0.34928240250923653,
+      "sensitivity": 0.06,
+      "specificity": 0.9958847736625515,
+      "precision": 0.42857142857142855,
+      "accuracy": 0.9500978473581213,
+      "flagged": 7,
+      "flagged_fraction": 0.00684931506849315
+    },
+    {
+      "threshold": 0.3584562477553149,
+      "sensitivity": 0.06,
+      "specificity": 0.9958847736625515,
+      "precision": 0.42857142857142855,
+      "accuracy": 0.9500978473581213,
+      "flagged": 7,
+      "flagged_fraction": 0.00684931506849315
+    },
+    {
+      "threshold": 0.3676300930013934,
+      "sensitivity": 0.06,
+      "specificity": 0.9958847736625515,
+      "precision": 0.42857142857142855,
+      "accuracy": 0.9500978473581213,
+      "flagged": 7,
+      "flagged_fraction": 0.00684931506849315
+    },
+    {
+      "threshold": 0.37680393824747177,
+      "sensitivity": 0.06,
+      "specificity": 0.9969135802469136,
+      "precision": 0.5,
+      "accuracy": 0.9510763209393346,
+      "flagged": 6,
+      "flagged_fraction": 0.005870841487279843
+    },
+    {
+      "threshold": 0.3859777834935502,
+      "sensitivity": 0.06,
+      "specificity": 0.9979423868312757,
+      "precision": 0.6,
+      "accuracy": 0.952054794520548,
+      "flagged": 5,
+      "flagged_fraction": 0.004892367906066536
+    },
+    {
+      "threshold": 0.3951516287396286,
+      "sensitivity": 0.04,
+      "specificity": 0.9979423868312757,
+      "precision": 0.5,
+      "accuracy": 0.9510763209393346,
+      "flagged": 4,
+      "flagged_fraction": 0.003913894324853229
+    },
+    {
+      "threshold": 0.40432547398570706,
+      "sensitivity": 0.04,
+      "specificity": 0.9989711934156379,
+      "precision": 0.6666666666666666,
+      "accuracy": 0.952054794520548,
+      "flagged": 3,
+      "flagged_fraction": 0.0029354207436399216
+    },
+    {
+      "threshold": 0.41349931923178546,
+      "sensitivity": 0.04,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.9530332681017613,
+      "flagged": 2,
+      "flagged_fraction": 0.0019569471624266144
+    },
+    {
+      "threshold": 0.4226731644778639,
+      "sensitivity": 0.04,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.9530332681017613,
+      "flagged": 2,
+      "flagged_fraction": 0.0019569471624266144
+    },
+    {
+      "threshold": 0.4318470097239423,
+      "sensitivity": 0.04,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.9530332681017613,
+      "flagged": 2,
+      "flagged_fraction": 0.0019569471624266144
+    },
+    {
+      "threshold": 0.4410208549700207,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.45019470021609914,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.45936854546217754,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.468542390708256,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.4777162359543344,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.4868900812004128,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.4960639264464912,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.5052377716925696,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.514411616938648,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.5235854621847265,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.5327593074308049,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    },
+    {
+      "threshold": 0.5419331526768832,
+      "sensitivity": 0.02,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "accuracy": 0.952054794520548,
+      "flagged": 1,
+      "flagged_fraction": 0.0009784735812133072
+    }
+  ],
+  "performance": {
+    "pr_auc": 0.25748634924688174,
+    "pr_auc_no_skill": 0.04892367906066536,
+    "roc_auc": 0.8425102880658437,
+    "brier": 0.04107175304146299,
+    "prevalence": 0.04892367906066536,
+    "n_test": 1022,
+    "n_test_positive": 50,
+    "mean_predicted_risk": 0.04683376690382784
+  },
+  "dataset": {
+    "rows": 5110,
+    "positives": 249,
+    "prevalence": 0.0487279843444227
+  }
+};

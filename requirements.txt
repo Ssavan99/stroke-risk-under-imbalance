@@ -1,0 +1,8 @@
+# Runtime dependencies, pinned for reproducibility.
+# Verified on CPython 3.10 and 3.12.
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.2
+imbalanced-learn==0.12.4
+matplotlib==3.9.2
+joblib==1.4.2
