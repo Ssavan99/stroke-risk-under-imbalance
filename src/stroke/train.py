@@ -11,10 +11,13 @@ The protocol, in order:
 3. Select one configuration on cross-validated PR-AUC.
 4. Choose the decision threshold on cross-validated out-of-fold predictions over
    the training portion, so the held-out set never moves it.
-5. Evaluate that configuration and that threshold on the held-out set exactly
-   once, and stop.
+5. Evaluate that configuration and that threshold on the held-out set, and stop.
 
-Step 5 is not revisited after seeing the result. That is the whole discipline.
+Every other configuration is also scored on the held-out set, so the comparison
+table is like-for-like — but each gets its own threshold fixed on its own
+training folds, and *selection is never revised after seeing any of it*. That
+last clause is the whole discipline. Reporting a comparison is not the same as
+choosing from one.
 """
 
 from __future__ import annotations
@@ -28,6 +31,7 @@ from datetime import datetime, timezone
 
 import numpy as np
 import sklearn
+from sklearn.base import clone
 from sklearn.model_selection import (
     RepeatedStratifiedKFold,
     StratifiedKFold,
@@ -41,6 +45,7 @@ from .config import (
     CV_REPEATS,
     CV_SPLITS,
     N_BOOTSTRAP,
+    N_JOBS,
     OUTPUT_DIR,
     SEED,
     TARGET_SENSITIVITY,
@@ -52,6 +57,7 @@ from .evaluate import (
     calibration_bins,
     discrimination,
     operating_point,
+    operating_point_ci,
     pr_curve_points,
     threshold_sweep,
 )
@@ -94,7 +100,7 @@ def _cv(pipe, X, y, *, splits: int, repeats: int, seed: int) -> tuple[float, flo
         y,
         cv=cv,
         scoring=("average_precision", "roc_auc"),
-        n_jobs=-1,
+        n_jobs=N_JOBS,
         error_score="raise",
     )
     return (
@@ -151,7 +157,7 @@ def choose_threshold(pipe, X_train, y_train, *, splits: int, seed: int) -> tuple
     """
     cv = StratifiedKFold(n_splits=splits, shuffle=True, random_state=seed)
     oof = cross_val_predict(
-        pipe, X_train, y_train, cv=cv, method="predict_proba", n_jobs=-1
+        pipe, X_train, y_train, cv=cv, method="predict_proba", n_jobs=N_JOBS
     )[:, 1]
     op = operating_point(y_train, oof, TARGET_SENSITIVITY)
     return op.threshold, op.as_dict()
@@ -182,18 +188,25 @@ def evaluate_on_test(
     metrics["pr_auc_ci95"] = [pr_lo, pr_hi]
     metrics["roc_auc_ci95"] = [roc_lo, roc_hi]
     metrics["mean_predicted_risk"] = float(np.mean(y_prob))
+
+    # `operating_point` is only ever populated from a threshold fixed on training
+    # data. A caller that supplies no threshold gets no `operating_point` key at
+    # all, rather than a test-tuned one under an innocent-looking name — every
+    # config in this file is scored the same way, so a table templated from these
+    # values cannot accidentally publish oracle numbers.
     if threshold is not None:
-        # The reported operating point: threshold fixed on training data, applied
-        # here as-is. Achieved sensitivity will not land exactly on the target.
-        metrics["operating_point"] = apply_threshold(y_test, y_prob, threshold).as_dict()
-        metrics["operating_point"]["threshold_source"] = "training out-of-fold"
-    # Shown alongside for reference only: what the threshold would have been if it
-    # were tuned on the held-out set. Optimistic by construction, never reported.
+        op = apply_threshold(y_test, y_prob, threshold)
+        entry = op.as_dict()
+        entry["threshold_source"] = "training out-of-fold"
+        entry.update(operating_point_ci(op))
+        metrics["operating_point"] = entry
+
+    # Kept for reference under an unambiguous name: what the threshold would have
+    # been if tuned on the held-out set. Optimistic by construction. Its presence
+    # is what lets the README quantify how much that tuning would have bought.
     oracle = operating_point(y_test, y_prob, TARGET_SENSITIVITY).as_dict()
-    oracle["threshold_source"] = "held-out (oracle, not reported)"
+    oracle["threshold_source"] = "held-out (oracle, NOT reported)"
     metrics["operating_point_oracle"] = oracle
-    if threshold is None:
-        metrics["operating_point"] = oracle
     metrics["calibration"] = calibration_bins(y_test, y_prob)
     metrics["threshold_sweep"] = threshold_sweep(y_test, y_prob)
     metrics["pr_curve"] = pr_curve_points(y_test, y_prob)
@@ -269,26 +282,41 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     # Every configuration is also scored on the held-out set so the comparison
-    # table in the README is like-for-like. Selection still used CV only.
+    # table is like-for-like. Each one gets its *own* threshold fixed on its own
+    # training out-of-fold predictions, so no row in the table is test-tuned.
+    # Selection still used cross-validation only.
+    print("\nscoring every configuration on the held-out set:")
     per_config: dict[str, dict] = {}
-    for name in ESTIMATORS:
-        for strategy in STRATEGIES:
-            per_config[f"{name}__{strategy}"] = evaluate_on_test(
-                build_pipeline(name, strategy, seed),
-                X_train,
-                y_train,
-                X_test,
-                y_test,
-                n_bootstrap=n_bootstrap,
-                seed=seed,
-            )
-    for label, pipe in (
+    candidates: list[tuple[str, object]] = [
+        (f"{name}__{strategy}", build_pipeline(name, strategy, seed))
+        for name in ESTIMATORS
+        for strategy in STRATEGIES
+    ]
+    candidates += [
         ("baseline_majority", majority_pipeline(seed)),
         ("baseline_age_only", age_only_pipeline(seed)),
-    ):
+    ]
+
+    for label, pipe in candidates:
+        if label == "baseline_majority":
+            # A constant predictor has no threshold that separates anything; a
+            # sensitivity target is meaningless for it. Recorded without one.
+            own_threshold = None
+        else:
+            own_threshold, _ = choose_threshold(
+                clone(pipe), X_train, y_train, splits=CV_SPLITS, seed=seed
+            )
         per_config[label] = evaluate_on_test(
-            pipe, X_train, y_train, X_test, y_test, n_bootstrap=n_bootstrap, seed=seed
+            clone(pipe),
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            n_bootstrap=n_bootstrap,
+            seed=seed,
+            threshold=own_threshold,
         )
+        print(f"  {label}")
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     payload = {

@@ -6,6 +6,7 @@ result can be traced back to the settings that produced it.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 # --- paths -----------------------------------------------------------------
@@ -62,3 +63,15 @@ TARGET_SENSITIVITY = 0.80
 
 #: Bootstrap resamples used for confidence intervals on test-set metrics.
 N_BOOTSTRAP = 2000
+
+# --- parallelism -----------------------------------------------------------
+
+#: Worker processes for cross-validation.
+#:
+#: Deliberately capped rather than -1. Under loky, -1 spawns one process per
+#: core, each holding its own copy of a resampled fold; on a many-core machine
+#: that has been observed to exhaust memory mid-run and, with
+#: ``error_score="raise"``, take the whole job down after several minutes of
+#: work. The entry point of this repository is the first thing a reader runs, so
+#: it favours finishing over finishing fastest.
+N_JOBS = min(4, (os.cpu_count() or 1))

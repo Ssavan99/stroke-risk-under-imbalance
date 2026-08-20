@@ -128,7 +128,7 @@
     "cat__smoking_status_smokes"
   ],
   "operating_point": {
-    "threshold": 0.04738078223127882,
+    "threshold": 0.047380782231217645,
     "sensitivity": 0.8,
     "specificity": 0.7448559670781894,
     "precision": 0.1388888888888889,

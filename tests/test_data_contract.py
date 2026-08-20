@@ -64,9 +64,11 @@ def test_numeric_features_are_numeric(raw):
         assert raw[col].dtype.kind in "if", f"{col} should be numeric, got {raw[col].dtype}"
 
 
-def test_categorical_features_are_strings(raw):
+def test_categorical_features_are_object_dtype(raw):
+    """Object, not pandas StringDtype — see tests/test_categorical_missing.py."""
     for col in CATEGORICAL_FEATURES:
-        assert raw[col].dtype == "string", f"{col} should be string, got {raw[col].dtype}"
+        assert raw[col].dtype == object, f"{col} should be object, got {raw[col].dtype}"
+        assert isinstance(raw[col].iloc[0], str)
 
 
 def test_only_bmi_has_missing_values(raw):

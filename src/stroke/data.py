@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -35,7 +36,14 @@ def load_raw(path: Path | str = DATA_PATH) -> pd.DataFrame:
     df = pd.read_csv(path)
     df = df.drop(columns=[c for c in DROP_COLUMNS if c in df.columns])
     for col in CATEGORICAL_FEATURES:
-        df[col] = df[col].astype("string")
+        # Deliberately object dtype rather than pandas StringDtype. StringDtype
+        # represents nulls as pd.NA, and SimpleImputer detects missing values in
+        # object arrays with a `X != X` self-inequality test — which returns
+        # pd.NA rather than True and raises "boolean value of NA is ambiguous".
+        # The categorical columns happen to have no nulls today, so the imputer
+        # never runs and the bug stays hidden until someone re-downloads the CSV,
+        # maps "Unknown" to null, or submits a partially filled form.
+        df[col] = df[col].astype(object).where(df[col].notna(), np.nan)
     return df
 
 

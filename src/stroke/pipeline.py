@@ -82,6 +82,13 @@ def build_estimator(name: str, strategy: str, seed: int = SEED):
             max_iter=300,
             learning_rate=0.05,
             class_weight="balanced" if balanced else None,
+            # Explicitly off. The "auto" default switches on above 10,000 samples
+            # and carves out its own internal validation split — which, under the
+            # SMOTE strategy, would separate synthetic points from the real ones
+            # they were interpolated from. Post-SMOTE this dataset tops out at
+            # 9,722 rows so it cannot trigger today, but that is an arithmetic
+            # coincidence rather than a guarantee.
+            early_stopping=False,
             random_state=seed,
         )
     raise ValueError(f"unknown estimator: {name!r}")

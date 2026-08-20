@@ -97,7 +97,12 @@ def operating_point(
     y_prob = np.asarray(y_prob, dtype=float)
 
     # roc_curve gives tpr at every distinct threshold, which is what we search.
-    _fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+    # drop_intermediate=False because the default (True) discards collinear
+    # points for plotting, which can leave the highest qualifying threshold out
+    # of the array entirely when scores are tied. It makes no measurable
+    # difference on this dataset, but it makes the docstring above exactly true
+    # rather than true-in-practice.
+    _fpr, tpr, thresholds = roc_curve(y_true, y_prob, drop_intermediate=False)
     qualifying = np.flatnonzero(tpr >= target_sensitivity)
     # thresholds is descending, so the first qualifying index is the highest
     # threshold that still reaches the target recall. Nothing qualifying is only
@@ -236,6 +241,44 @@ def bootstrap_ci(
 
     lo, hi = np.quantile(scores, [alpha / 2, 1 - alpha / 2])
     return float(lo), float(hi)
+
+
+def proportion_ci(successes: int, trials: int, alpha: float = 0.05) -> tuple[float, float]:
+    """Wilson score interval for a proportion.
+
+    Sensitivity and precision at the reported threshold are proportions over 50
+    and 309 cases respectively, so quoting them as bare point estimates implies
+    a precision the data does not have. Wilson rather than normal-approximation
+    because it stays inside [0, 1] and behaves at small counts, which is the
+    regime this dataset is permanently in.
+    """
+    if trials <= 0:
+        return (0.0, 0.0)
+
+    from math import sqrt
+
+    # 1.959964 is the 97.5th percentile of the standard normal, i.e. alpha=0.05.
+    z = 1.959963984540054 if abs(alpha - 0.05) < 1e-9 else _z_for(alpha)
+    p = successes / trials
+    denom = 1 + z**2 / trials
+    centre = (p + z**2 / (2 * trials)) / denom
+    halfwidth = z * sqrt(p * (1 - p) / trials + z**2 / (4 * trials**2)) / denom
+    return (max(0.0, centre - halfwidth), min(1.0, centre + halfwidth))
+
+
+def _z_for(alpha: float) -> float:  # pragma: no cover - only for non-default alpha
+    from statistics import NormalDist
+
+    return NormalDist().inv_cdf(1 - alpha / 2)
+
+
+def operating_point_ci(op: OperatingPoint) -> dict[str, list[float]]:
+    """Wilson intervals for the rates quoted at the reported operating point."""
+    return {
+        "sensitivity_ci95": list(proportion_ci(op.tp, op.tp + op.fn)),
+        "precision_ci95": list(proportion_ci(op.tp, op.tp + op.fp)),
+        "specificity_ci95": list(proportion_ci(op.tn, op.tn + op.fp)),
+    }
 
 
 def calibration_bins(y_true, y_prob, n_bins: int = 10) -> list[dict[str, float]]:

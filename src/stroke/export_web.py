@@ -91,7 +91,7 @@ def build_payload(seed: int = SEED) -> dict:
     # rest of the project — never tuned on the held-out set.
     from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
-    from .config import CV_SPLITS
+    from .config import CV_SPLITS, N_JOBS
     from .evaluate import operating_point
 
     oof = cross_val_predict(
@@ -100,7 +100,7 @@ def build_payload(seed: int = SEED) -> dict:
         y_train,
         cv=StratifiedKFold(n_splits=CV_SPLITS, shuffle=True, random_state=seed),
         method="predict_proba",
-        n_jobs=-1,
+        n_jobs=N_JOBS,
     )[:, 1]
     threshold = operating_point(y_train, oof, TARGET_SENSITIVITY).threshold
     op = apply_threshold(y_test, prob_test, threshold)
