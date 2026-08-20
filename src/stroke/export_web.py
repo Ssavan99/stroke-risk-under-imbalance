@@ -39,6 +39,29 @@ from .pipeline import build_pipeline
 WEB_DIR = Path(__file__).resolve().parents[2] / "web"
 
 
+# Fitted floating-point values differ in the last one or two units in the last
+# place between BLAS builds, so an exported payload built on one machine never
+# matches one built on another byte for byte. Quantising every float on the way
+# out makes the committed artefact reproducible anywhere, which is the only way
+# a "regenerate and diff" staleness check can mean anything. Twelve significant
+# digits is far finer than the demo displays and far finer than ``verify``'s
+# 1e-9 tolerance, so it costs nothing real.
+EXPORT_SIG_DIGITS = 12
+
+
+def _quantize(obj, sig: int = EXPORT_SIG_DIGITS):
+    """Recursively round every float so the serialised bytes are platform-stable."""
+    if isinstance(obj, float):
+        if not np.isfinite(obj) or obj == 0.0:
+            return obj
+        return float(f"%.{sig}g" % obj)
+    if isinstance(obj, dict):
+        return {k: _quantize(v, sig) for k, v in obj.items()}
+    if isinstance(obj, list | tuple):
+        return [_quantize(v, sig) for v in obj]
+    return obj
+
+
 def _preprocessor_spec(pipe) -> dict:
     """Pull the fitted imputation/scaling/encoding constants out of the pipeline."""
     pre = pipe.named_steps["preprocess"]
@@ -216,6 +239,9 @@ def write_all(seed: int = SEED) -> list[Path]:
         ],
     }
 
+    payload = _quantize(payload)
+    fixture = _quantize(fixture)
+
     WEB_DIR.mkdir(parents=True, exist_ok=True)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -243,6 +269,79 @@ def write_all(seed: int = SEED) -> list[Path]:
     return written
 
 
+def _compare(a, b, path: str, rtol: float, atol: float, out: list[str]) -> None:
+    """Walk two payloads together, allowing floats to differ within tolerance."""
+    if isinstance(a, float) or isinstance(b, float):
+        try:
+            fa, fb = float(a), float(b)
+        except (TypeError, ValueError):
+            out.append(f"{path}: {a!r} vs {b!r}")
+            return
+        if not np.isclose(fa, fb, rtol=rtol, atol=atol, equal_nan=True):
+            out.append(f"{path}: {fa!r} != {fb!r} (delta {abs(fa - fb):.3e})")
+        return
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in sorted(set(a) | set(b)):
+            if k not in a:
+                out.append(f"{path}.{k}: missing from rebuilt payload")
+            elif k not in b:
+                out.append(f"{path}.{k}: missing from committed payload")
+            else:
+                _compare(a[k], b[k], f"{path}.{k}", rtol, atol, out)
+        return
+    if isinstance(a, list) and isinstance(b, list):
+        if len(a) != len(b):
+            out.append(f"{path}: length {len(a)} != {len(b)}")
+            return
+        for i, (x, y) in enumerate(zip(a, b, strict=False)):
+            _compare(x, y, f"{path}[{i}]", rtol, atol, out)
+        return
+    if a != b:
+        out.append(f"{path}: {a!r} != {b!r}")
+
+
+def check_all(seed: int = SEED, rtol: float = 1e-6, atol: float = 1e-12) -> list[str]:
+    """Rebuild the payloads and report how the committed ones differ, if at all.
+
+    Returns a list of human-readable differences; empty means ``web/`` is current.
+    A numeric comparison rather than a byte comparison, so that a rounding tie at
+    the quantisation boundary reports as "identical within tolerance" instead of
+    failing a build over the twelfth decimal place.
+    """
+    payload = _quantize(build_payload(seed))
+
+    diffs: list[str] = []
+    for name, rebuilt in (("model.json", payload),):
+        path = WEB_DIR / name
+        if not path.exists():
+            diffs.append(f"{name}: not committed")
+            continue
+        committed = json.loads(path.read_text(encoding="utf-8"))
+        _compare(rebuilt, committed, name, rtol, atol, diffs)
+    return diffs
+
+
 if __name__ == "__main__":
-    for p in write_all():
-        print(f"wrote {p}")
+    import argparse
+
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="verify the committed web/ payload matches a fresh rebuild, without writing",
+    )
+    args = ap.parse_args()
+
+    if args.check:
+        differences = check_all()
+        if differences:
+            print("web/ is stale; differences beyond tolerance:")
+            for d in differences[:20]:
+                print(f"  {d}")
+            if len(differences) > 20:
+                print(f"  ... and {len(differences) - 20} more")
+            raise SystemExit(1)
+        print("web/ is current (within tolerance)")
+    else:
+        for p in write_all():
+            print(f"wrote {p}")

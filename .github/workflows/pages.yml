@@ -46,10 +46,12 @@ jobs:
           pip install -r requirements.txt
           pip install -e .
 
-      - name: Rebuild the exported model and fail on drift
+      # A numeric comparison, not a byte comparison: fitted coefficients differ
+      # in the last units in the last place between BLAS builds, so diffing the
+      # regenerated JSON fails on runner-vs-laptop noise rather than real drift.
+      - name: Verify the exported model is current
         run: |
-          python -m stroke.export_web
-          git diff --exit-code -- web/ || {
+          python -m stroke.export_web --check || {
             echo "::error::web/ is stale — run 'python -m stroke.export_web' and commit the result"
             exit 1
           }
