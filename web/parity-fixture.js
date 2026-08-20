@@ -1,5 +1,5 @@
 window.STROKE_PARITY = {
-  "max_abs_error_python": 1.3877787807814457e-16,
+  "max_abs_error_python": 1.38777878078e-16,
   "cases": [
     {
       "input": {
@@ -14,7 +14,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.05191001678331756
+      "expected": 0.0519100167833
     },
     {
       "input": {
@@ -29,7 +29,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "never smoked"
       },
-      "expected": 0.01331837362516656
+      "expected": 0.0133183736252
     },
     {
       "input": {
@@ -44,7 +44,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "smokes"
       },
-      "expected": 0.005629731115122157
+      "expected": 0.00562973111512
     },
     {
       "input": {
@@ -59,7 +59,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "never smoked"
       },
-      "expected": 0.005000616682832376
+      "expected": 0.00500061668283
     },
     {
       "input": {
@@ -74,7 +74,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "formerly smoked"
       },
-      "expected": 0.08420293113566373
+      "expected": 0.0842029311357
     },
     {
       "input": {
@@ -89,7 +89,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "Unknown"
       },
-      "expected": 0.0008671194633052634
+      "expected": 0.000867119463305
     },
     {
       "input": {
@@ -104,7 +104,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "Unknown"
       },
-      "expected": 0.028645541031766315
+      "expected": 0.0286455410318
     },
     {
       "input": {
@@ -119,7 +119,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.0025224340852008542
+      "expected": 0.0025224340852
     },
     {
       "input": {
@@ -134,7 +134,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.0019469261364530646
+      "expected": 0.00194692613645
     },
     {
       "input": {
@@ -149,7 +149,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "Unknown"
       },
-      "expected": 0.0008667624797662654
+      "expected": 0.000866762479766
     },
     {
       "input": {
@@ -164,7 +164,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "never smoked"
       },
-      "expected": 0.20178841972506725
+      "expected": 0.201788419725
     },
     {
       "input": {
@@ -179,7 +179,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "smokes"
       },
-      "expected": 0.007159841749534328
+      "expected": 0.00715984174953
     },
     {
       "input": {
@@ -194,7 +194,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "never smoked"
       },
-      "expected": 0.09832556669651488
+      "expected": 0.0983255666965
     },
     {
       "input": {
@@ -209,7 +209,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.0037847966773709
+      "expected": 0.00378479667737
     },
     {
       "input": {
@@ -224,7 +224,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.012904189646633875
+      "expected": 0.0129041896466
     },
     {
       "input": {
@@ -239,7 +239,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "Unknown"
       },
-      "expected": 0.0010791177432329941
+      "expected": 0.00107911774323
     },
     {
       "input": {
@@ -254,7 +254,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "never smoked"
       },
-      "expected": 0.003599487920843906
+      "expected": 0.00359948792084
     },
     {
       "input": {
@@ -269,7 +269,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.00828461735990977
+      "expected": 0.00828461735991
     },
     {
       "input": {
@@ -284,7 +284,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "Unknown"
       },
-      "expected": 0.0012511542705042253
+      "expected": 0.0012511542705
     },
     {
       "input": {
@@ -299,7 +299,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "Unknown"
       },
-      "expected": 0.0051978716603127625
+      "expected": 0.00519787166031
     },
     {
       "input": {
@@ -314,7 +314,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.02305904517160006
+      "expected": 0.0230590451716
     },
     {
       "input": {
@@ -329,7 +329,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "formerly smoked"
       },
-      "expected": 0.005345646651209626
+      "expected": 0.00534564665121
     },
     {
       "input": {
@@ -344,7 +344,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.08412718632429265
+      "expected": 0.0841271863243
     },
     {
       "input": {
@@ -359,7 +359,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Rural",
         "smoking_status": "never smoked"
       },
-      "expected": 0.002264495627693729
+      "expected": 0.00226449562769
     },
     {
       "input": {
@@ -374,7 +374,7 @@ window.STROKE_PARITY = {
         "Residence_type": "Urban",
         "smoking_status": "never smoked"
       },
-      "expected": 0.00589924620917237
+      "expected": 0.00589924620917
     }
   ]
 };
