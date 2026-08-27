@@ -151,3 +151,6 @@ GridSearchCV*
 
 # Local editor/agent scratch
 .claude/
+
+# Generated code knowledge graph
+graphify-out/
